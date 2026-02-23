@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useTheme } from "next-themes";
 import gsap from "gsap";
 import Image from "next/image";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
@@ -30,22 +31,57 @@ const slides = [
   {
     label: "01 / Modern Living",
     title: "Redefine\nYour Space",
-    subtitle: "Luxury homes curated for the discerning few.",
+    subtitle:
+      "Luxury homes curated for the discerning few where every detail tells a story of refined taste and timeless elegance.",
     cta: "Explore Properties",
   },
   {
     label: "02 / Premium Estates",
     title: "Where Dreams\nTake Form",
-    subtitle: "Architecture that speaks before you walk inside.",
+    subtitle:
+      "Architecture that speaks before you walk inside — crafted for those who understand that home is more than a place.",
     cta: "View Listings",
   },
   {
     label: "03 / Exclusive Deals",
     title: "Invest in\nTimeless Value",
-    subtitle: "The finest properties in the most coveted locations.",
+    subtitle:
+      "The finest properties in the most coveted locations — because true luxury is never just about the price.",
     cta: "Get Started",
   },
 ];
+
+function useIsLight(): boolean {
+  const { resolvedTheme } = useTheme();
+
+  const getTheme = (): boolean => {
+    if (typeof window === "undefined") return false;
+    const html = document.documentElement;
+    const attr = html.getAttribute("data-theme");
+    if (attr) return attr === "light";
+    return html.classList.contains("light");
+  };
+
+  const [isLight, setIsLight] = useState<boolean>(getTheme);
+
+  useEffect(() => {
+    setIsLight(resolvedTheme === "light");
+
+    const observer = new MutationObserver(() => {
+      setIsLight(getTheme());
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme"],
+    });
+
+    return () => observer.disconnect();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedTheme]);
+
+  return isLight;
+}
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,6 +93,8 @@ export default function HeroSection() {
   const isAnimating = useRef(false);
   const scrollBuffer = useRef(0);
   const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const isLight = useIsLight();
 
   const DURATION = 1.1;
   const EASE = "power4.inOut";
@@ -224,37 +262,31 @@ export default function HeroSection() {
   return (
     <section
       ref={containerRef}
-      className={`hero-section ${cormorant.variable} ${montserrat.variable}`}
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "100dvh",
-        overflow: "hidden",
-        background: "#05040a",
-        fontFamily: cormorant.style.fontFamily,
-      }}
+      className={`${cormorant.variable} ${montserrat.variable} relative w-full h-dvh overflow-hidden bg-background`}
     >
       {/* Grain texture */}
       <div className="hero-grain" />
 
-      {/* Slide progress bar */}
-      <div ref={progressRef} className="hero-progress" />
+      {/* Slide progress bar — uses primary color via CSS class */}
+      <div
+        ref={progressRef}
+        className="hero-progress absolute top-0 left-0 w-full h-0.5 bg-primary z-50 origin-left scale-x-0"
+      />
 
       {/* Slide images */}
       {images.map((img, i) => (
         <div
           key={i}
-          ref={(el) => { if (el) outerRefs.current[i] = el; }}
-          style={{
-            position: "absolute",
-            inset: 0,
-            overflow: "hidden",
-            willChange: "transform",
+          ref={(el) => {
+            if (el) outerRefs.current[i] = el;
           }}
+          className="absolute inset-0 overflow-hidden will-change-transform"
         >
           <div
-            ref={(el) => { if (el) imgRefs.current[i] = el; }}
-            style={{ position: "absolute", inset: 0, willChange: "transform" }}
+            ref={(el) => {
+              if (el) imgRefs.current[i] = el;
+            }}
+            className="absolute inset-0 will-change-transform"
           >
             <Image
               src={img.src}
@@ -262,10 +294,11 @@ export default function HeroSection() {
               fill
               priority={i === 0}
               sizes="100vw"
-              style={{ objectFit: "cover", objectPosition: img.position }}
+              className="object-cover"
+              style={{ objectPosition: img.position }}
             />
           </div>
-          <div className="hero-overlay" />
+          <div className={isLight ? "hero-overlay-light" : "hero-overlay-dark"} />
         </div>
       ))}
 
@@ -273,62 +306,28 @@ export default function HeroSection() {
       {slides.map((slide, i) => (
         <div
           key={i}
-          ref={(el) => { if (el) textRefs.current[i] = el; }}
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            padding: "80px 8vw 0 8vw",
-            zIndex: 10,
-            pointerEvents: i === current ? "auto" : "none",
+          ref={(el) => {
+            if (el) textRefs.current[i] = el;
           }}
+          className={`absolute inset-0 flex flex-col justify-center px-[8vw] pt-20 sm:pt-20 z-10 ${
+            i === current ? "pointer-events-auto" : "pointer-events-none"
+          }`}
         >
-          <div className="anim slide-num" style={{ marginBottom: 22 }}>
+          {/* Slide label — primary colour accent */}
+          <div className="anim slide-num mb-4 sm:mb-4.5 font-(family-name:--font-montserrat) text-xs tracking-[3px] uppercase text-primary/80 transition-colors duration-700">
             {slide.label}
           </div>
 
-          <h1
-            className="anim hero-title"
-            style={{
-              fontSize: "clamp(50px, 6.8vw, 96px)",
-              fontWeight: 300,
-              lineHeight: 1.04,
-              color: "#fff",
-              letterSpacing: "-0.5px",
-              margin: "0 0 26px",
-              whiteSpace: "pre-line",
-              fontFamily: cormorant.style.fontFamily,
-            }}
-          >
+          {/* Main headline — always white over the dark overlay */}
+          <h1 className="anim font-(family-name:--font-cormorant) text-[clamp(64px,9vw,128px)] sm:text-[clamp(84px,9vw,128px)] font-light leading-[1.04] tracking-[-0.5px] mb-4 sm:mb-7.5 whitespace-pre-line text-white/95 transition-colors duration-700">
             {slide.title}
           </h1>
 
-          {/* Gold divider */}
-          <div
-            className="anim"
-            style={{
-              width: 48,
-              height: 1,
-              background: "hsl(45 97% 47% / 0.7)",
-              marginBottom: 22,
-            }}
-          />
+          {/* Gold divider line — bg-primary */}
+          <div className="anim w-16 h-0.5 bg-primary/70 mb-3 sm:mb-6" />
 
-          <p
-            className="anim hero-subtitle"
-            style={{
-              fontFamily: montserrat.style.fontFamily,
-              fontWeight: 300,
-              fontSize: "clamp(12px, 1.2vw, 15px)",
-              color: "rgba(255,255,255,0.70)",
-              letterSpacing: "0.6px",
-              marginBottom: 44,
-              maxWidth: 360,
-              lineHeight: 1.8,
-            }}
-          >
+          {/* Subtitle — slightly muted white */}
+          <p className="anim font-(family-name:--font-montserrat) font-light text-[clamp(11px,1.45vw,18px)] sm:text-[clamp(13px,1.45vw,18px)] tracking-[0.6px] mb-6 sm:mb-11 max-w-120 leading-[1.7] sm:leading-[1.9] text-white/65 transition-colors duration-700">
             {slide.subtitle}
           </p>
 
@@ -341,58 +340,33 @@ export default function HeroSection() {
         </div>
       ))}
 
-      {/* Navigation dots */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 96,
-          left: "50%",
-          transform: "translateX(-50%)",
-          zIndex: 20,
-          display: "flex",
-          gap: 14,
-          alignItems: "center",
-        }}
-      >
+      {/* Navigation dots — active uses bg-primary */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3.5 items-center">
         {slides.map((_, i) => (
           <button
             key={i}
-            className={`hero-dot ${i === current ? "active" : ""}`}
             onClick={() => goTo(i)}
             aria-label={`Go to slide ${i + 1}`}
+            className={`rounded-full transition-all duration-300 ${
+              i === current
+                ? "w-5 h-2 bg-primary shadow-[0_0_10px_2px_hsl(var(--primary)/0.5)]"
+                : "w-2 h-2 bg-white/30 hover:bg-white/60"
+            }`}
           />
         ))}
       </div>
 
       {/* Scroll indicator */}
-      <div style={{ position: "absolute", bottom: 84, left: "8vw", zIndex: 20 }}>
+      <div className="absolute bottom-8 left-[8vw] z-20 flex flex-col items-center gap-2">
         <div className="scroll-arrow">
           <div className="scroll-arrow-icon" />
           <span className="scroll-arrow-label">Scroll</span>
         </div>
       </div>
 
-      {/* Slide counter */}
-      <div
-        className="hero-counter"
-        style={{
-          position: "absolute",
-          bottom: 98,
-          right: "4vw",
-          zIndex: 20,
-          fontFamily: cormorant.style.fontFamily,
-          fontSize: 43,
-          color: "rgba(255,255,255,0.35)",
-          letterSpacing: 2,
-        }}
-      >
+      <div className="absolute bottom-8 right-[4vw] z-20 font-(family-name:--font-cormorant) text-3xl md:text-5xl tracking-[2px] text-white/35 transition-colors duration-700">
         {String(current + 1).padStart(2, "0")}
-        <span
-          className="hero-counter-sep"
-          style={{ margin: "0 6px", color: "rgba(255,255,255,0.15)" }}
-        >
-          /
-        </span>
+        <span className="mx-1.5 text-white/18">/</span>
         {String(slides.length).padStart(2, "0")}
       </div>
     </section>

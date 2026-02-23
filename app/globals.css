@@ -310,33 +310,19 @@
 /* --- Initial anim state --- */
 .hero-section .anim { opacity: 0; }
 
-/* --- Overlay --- */
-.hero-overlay {
+/* Shared base for both overlays */
+.hero-overlay-dark,
+.hero-overlay-light {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background:
-    linear-gradient(
-      105deg,
-      hsl(0 0% 2% / 0.80) 0%,
-      hsl(0 0% 2% / 0.45) 50%,
-      hsl(0 0% 2% / 0.14) 100%
-    ),
-    radial-gradient(ellipse at center, transparent 30%, hsl(0 0% 0% / 0.52) 100%);
   transition: background 0.5s ease;
 }
-html:not(.dark) .hero-overlay {
-  background:
-    linear-gradient(
-      105deg,
-      hsl(0 0% 8% / 0.72) 0%,
-      hsl(0 0% 8% / 0.38) 50%,
-      hsl(0 0% 8% / 0.10) 100%
-    ),
-    radial-gradient(ellipse at center, transparent 30%, hsl(0 0% 0% / 0.40) 100%);
-}
-.hero-overlay::after {
+
+/* Gold accent line at the bottom — same for both */
+.hero-overlay-dark::after,
+.hero-overlay-light::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -345,10 +331,32 @@ html:not(.dark) .hero-overlay {
   height: 2px;
   background: linear-gradient(
     to right,
-    hsl(45 97% 47% / 0.75) 0%,
-    hsl(45 97% 47% / 0.2) 50%,
+    hsl(var(--primary) / 0.75) 0%,
+    hsl(var(--primary) / 0.2) 50%,
     transparent 100%
   );
+}
+.hero-overlay-dark {
+  background:
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.92) 0%,
+      rgba(0, 0, 0, 0.68) 45%,
+      rgba(0, 0, 0, 0.40) 100%
+    ),
+    radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+
+.hero-overlay-light {
+  background:
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.46) 45%,
+      rgba(0, 0, 0, 0.22) 100%
+    ),
+    radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.42) 100%);
 }
 
 /* --- Navigation dots --- */
@@ -362,10 +370,11 @@ html:not(.dark) .hero-overlay {
   transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .hero-dot.active {
-  background: hsl(45 97% 47%);
-  border-color: hsl(45 97% 47%);
+  /* Uses the primary token so it's always gold */
+  background: hsl(var(--primary));
+  border-color: hsl(var(--primary));
   transform: scale(1.35);
-  box-shadow: 0 0 14px hsl(45 97% 47% / 0.6);
+  box-shadow: 0 0 14px hsl(var(--primary) / 0.6);
 }
 
 /* --- CTA button --- */
@@ -392,14 +401,14 @@ html:not(.dark) .hero-overlay {
   content: '';
   position: absolute;
   inset: 0;
-  background: hsl(45 97% 47% / 0.12);
+  background: hsl(var(--primary) / 0.12);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .hero-cta:hover::before { transform: scaleX(1); }
 .hero-cta:hover {
-  border-color: hsl(45 97% 47% / 0.7);
+  border-color: hsl(var(--primary) / 0.7);
   color: hsl(45 97% 80%);
 }
 
@@ -430,7 +439,8 @@ html:not(.dark) .hero-overlay {
   font-family: var(--font-montserrat), sans-serif;
   font-size: 10px;
   letter-spacing: 4px;
-  color: hsl(45 97% 47% / 0.85);
+  /* Uses primary token — always gold */
+  color: hsl(var(--primary) / 0.85);
   text-transform: uppercase;
 }
 
@@ -458,14 +468,14 @@ html:not(.dark) .hero-overlay {
   margin-top: 4px;
 }
 
-/* --- Progress bar --- */
+/* --- Progress bar — primary token --- */
 .hero-progress {
   position: absolute;
   bottom: 0;
   left: 0;
   height: 2px;
   width: 100%;
-  background: hsl(45 97% 47% / 0.6);
+  background: hsl(var(--primary) / 0.65);
   transform: scaleX(0);
   transform-origin: left center;
   z-index: 30;
@@ -483,12 +493,3 @@ html:not(.dark) .hero-overlay {
   background-repeat: repeat;
   background-size: 128px 128px;
 }
-
-/* --- Light mode overrides for hero text --- */
-html:not(.dark) .slide-num      { color: hsl(45 90% 65% / 0.9); }
-html:not(.dark) .hero-title     { color: #fff; }
-html:not(.dark) .hero-subtitle  { color: rgba(255, 255, 255, 0.72); }
-html:not(.dark) .hero-counter   { color: rgba(255, 255, 255, 0.40); }
-html:not(.dark) .hero-counter-sep { color: rgba(255, 255, 255, 0.18); }
-html:not(.dark) .hero-cta       { border-color: rgba(255, 255, 255, 0.35); color: #fff; }
-html:not(.dark) .hero-cta:hover { border-color: hsl(45 97% 47% / 0.7); color: hsl(45 97% 80%); }

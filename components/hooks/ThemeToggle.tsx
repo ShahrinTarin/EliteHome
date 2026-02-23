@@ -18,7 +18,7 @@ export function ThemeToggle() {
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label="Toggle theme"
-      className="relative flex items-center justify-center w-9 h-9 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 overflow-hidden transition-colors duration-300"
+      className="relative cursor-pointer flex items-center justify-center w-9 h-9 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 overflow-hidden transition-colors duration-300"
       style={{
         backgroundColor: isDark
           ? "hsl(var(--primary) / 0.12)"

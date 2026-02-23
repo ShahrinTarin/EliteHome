@@ -6,18 +6,16 @@ import {
   Search,
   Heart,
   User,
-  Menu,
-  X,
   Building2,
   Phone,
 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "../hooks/ThemeToggle";
+import { HamburgerButton } from "../ui/Hamburgerbutton";
 
 const navigation = [
   { name: "Buy", href: "/buy", icon: Building2 },
@@ -26,7 +24,6 @@ const navigation = [
   { name: "Contact", href: "/contact", icon: Phone },
 ];
 
-// Isolated per-item component so each manages its own hover state cleanly
 function NavItem({
   item,
   isActive,
@@ -69,16 +66,8 @@ function NavItem({
           animate={{ scaleX: drawn ? 1 : 0 }}
           transition={
             drawn
-              ? {
-                  type: "tween",
-                  ease: [0.22, 1, 0.36, 1],
-                  duration: 0.7,
-                }
-              : {
-                  type: "tween",
-                  ease: [0.64, 0, 0.78, 0],
-                  duration: 0.3,
-                }
+              ? { type: "tween", ease: [0.22, 1, 0.36, 1], duration: 0.7 }
+              : { type: "tween", ease: [0.64, 0, 0.78, 0], duration: 0.3 }
           }
         />
       </motion.span>
@@ -222,7 +211,7 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Mobile Actions */}
+            {/* Mobile Actions — Heart → ThemeToggle → Hamburger */}
             <div className="flex lg:hidden items-center gap-1">
               <Link href="/wishlist">
                 <motion.div whileTap={{ scale: 0.9 }}>
@@ -239,41 +228,13 @@ export default function Navbar() {
                 </motion.div>
               </Link>
 
-              <motion.div whileTap={{ scale: 0.9 }}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className={cn(
-                    "h-9 w-9 rounded-full",
-                    isTransparent && "text-white hover:bg-white/10"
-                  )}
-                >
-                  <AnimatePresence mode="wait">
-                    {isMobileMenuOpen ? (
-                      <motion.div
-                        key="close"
-                        initial={{ rotate: -90, opacity: 0 }}
-                        animate={{ rotate: 0, opacity: 1 }}
-                        exit={{ rotate: 90, opacity: 0 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        <X className="h-5 w-5" />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="menu"
-                        initial={{ rotate: 90, opacity: 0 }}
-                        animate={{ rotate: 0, opacity: 1 }}
-                        exit={{ rotate: -90, opacity: 0 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        <Menu className="h-5 w-5" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Button>
-              </motion.div>
+              <ThemeToggle />
+
+              <HamburgerButton
+                isOpen={isMobileMenuOpen}
+                onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                isTransparent={isTransparent}
+              />
             </div>
           </div>
         </div>
@@ -303,15 +264,6 @@ export default function Navbar() {
                 }}
               >
                 <div className="p-4 space-y-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="text"
-                      placeholder="Search properties, locations..."
-                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary transition-colors"
-                    />
-                  </div>
-
                   <nav className="space-y-1">
                     {navigation.map((item, index) => (
                       <motion.div
