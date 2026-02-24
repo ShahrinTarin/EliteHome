@@ -320,7 +320,6 @@
   transition: background 0.5s ease;
 }
 
-/* Gold accent line at the bottom — same for both */
 .hero-overlay-dark::after,
 .hero-overlay-light::after {
   content: '';

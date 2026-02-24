@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ThemeToggle } from "../hooks/ThemeToggle";
+import { ThemeToggle } from "../../lib/hooks/themehooks/ThemeToggle";
 import { HamburgerButton } from "../ui/Hamburgerbutton";
 
 const navigation = [
@@ -162,9 +162,9 @@ export default function Navbar() {
                     variant="ghost"
                     size="icon"
                     className={cn(
-                      "h-10 w-10 rounded-full",
+                      "h-10 w-10 rounded-full cursor-pointer",
                       isTransparent
-                        ? "text-white hover:bg-white/10"
+                        ? "text-white hover:bg-white/50"
                         : "hover:bg-muted/80"
                     )}
                   >
@@ -219,8 +219,8 @@ export default function Navbar() {
                     variant="ghost"
                     size="icon"
                     className={cn(
-                      "h-9 w-9 rounded-full",
-                      isTransparent && "text-white hover:bg-white/10"
+                      "h-9 w-9 rounded-full cursor-pointer",
+                      isTransparent && "text-white hover:bg-white/50"
                     )}
                   >
                     <Heart className="h-5 w-5" />
