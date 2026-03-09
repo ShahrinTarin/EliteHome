@@ -13,13 +13,17 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     const [isSmoothReady, setIsSmoothReady] = useState(false);
 
     useEffect(() => {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            return;
+        }
+
         const ctx = gsap.context(() => {
             ScrollSmoother.create({
                 wrapper: smoothWrapperRef.current!,
                 content: smoothContentRef.current!,
-                smooth: 1.4,
+                smooth: 2.5,
                 effects: true,
-                smoothTouch: 0.1,
+                smoothTouch: 0.2,
                 normalizeScroll: true,
             });
             setIsSmoothReady(true);
